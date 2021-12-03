@@ -1,13 +1,25 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const bodyParser = require('body-parser');
 
 const app = express();
+
+const companyRouter = require('./routes/company');
+
+app.use(bodyParser.json());
+app.use(
+    bodyParser.urlencoded({
+      extended: true,
+    })
+  );
 
 app.get("/api", (req , res) => {
     res.json({
         mensaje: "Nodejs and JWT"
     });
 });
+
+app.use('/company', companyRouter);
 
 app.post("/api/login", (req , res) => {
     const user = {
