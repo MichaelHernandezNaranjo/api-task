@@ -2,10 +2,32 @@ const express = require('express');
 const router = express.Router();
 const companyService = require('../services/company');
 
-/* GET company */
-router.get('/', async function(req, res, next) {
+function verifyToken(req, res, next){
+  const bearerHeader =  req.headers['authorization'];
+
+  if(typeof bearerHeader !== 'undefined'){
+       const bearerToken = bearerHeader.split(" ")[1];
+       req.token  = bearerToken;
+       next();
+  }else{
+      res.sendStatus(403);
+  }
+}
+
+/* GET ALL company */
+router.get('/',verifyToken, async function(req, res, next) {
     try {
-      res.json(await companyService.getMultiple(req.query.page));
+      res.json(await companyService.getAll(req.query.page));
+    } catch (err) {
+      console.error(`Error while getting programming languages`, err.message);
+      next(err);
+    }
+  });
+
+  /* GET ID company */
+  router.get('/:id',verifyToken, async function(req, res, next) {
+    try {
+      res.json(await companyService.get(req.params.id));
     } catch (err) {
       console.error(`Error while getting programming languages`, err.message);
       next(err);
