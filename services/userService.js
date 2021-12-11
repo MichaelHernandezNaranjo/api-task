@@ -65,6 +65,21 @@ async function create(entitie){
     return false;
   }
 
+  async function updatePassword(userId, password){
+    const result = await db.query(
+      `UPDATE user
+      SET password=?
+      WHERE userId=?`,
+      [
+        password, userId
+      ]
+    );
+    if (result.affectedRows) {
+      return true;
+    }
+    return false;
+  }
+
   async function remove(userId){
     const result = await db.query(
       `DELETE FROM user WHERE userId=?`, 
@@ -81,5 +96,6 @@ async function create(entitie){
     get,
     create,
     update,
+    updatePassword,
     remove
   }
