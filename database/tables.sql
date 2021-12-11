@@ -30,6 +30,17 @@ CREATE TABLE `project`(
     CONSTRAINT `pk_project` PRIMARY KEY (`projectId`)
 );
 
+CREATE TABLE `status`(
+    `projectId` INT NOT NULL,
+    `statusId` INT NOT NULL,
+    `name` VARCHAR(120) NOT NULL,
+    `active` TINYINT(1) NOT NULL,
+    `createDate` DATETIME NOT NULL,
+    `createUserId` INT NOT NULL,
+    CONSTRAINT `pk_status` PRIMARY KEY (`projectId`,`statusId`),
+    CONSTRAINT `fk_status_project` FOREIGN KEY (`projectId`) REFERENCES `project` (`projectId`)
+);
+
 CREATE TABLE `sprint`(
     `projectId` INT NOT NULL,
     `sprintId` INT NOT NULL,
@@ -40,17 +51,6 @@ CREATE TABLE `sprint`(
     `createUserId` INT NOT NULL,
     CONSTRAINT `pk_sprint` PRIMARY KEY (`projectId`,`sprintId`),
     CONSTRAINT `fk_sprint_project` FOREIGN KEY (`projectId`) REFERENCES `project` (`projectId`)
-);
-
-CREATE TABLE `status`(
-    `projectId` INT NOT NULL,
-    `statusId` INT NOT NULL,
-    `name` VARCHAR(120) NOT NULL,
-    `active` TINYINT(1) NOT NULL,
-    `createDate` DATETIME NOT NULL,
-    `createUserId` INT NOT NULL,
-    CONSTRAINT `pk_status` PRIMARY KEY (`projectId`,`statusId`),
-    CONSTRAINT `fk_status_project` FOREIGN KEY (`projectId`) REFERENCES `project` (`projectId`)
 );
 
 CREATE TABLE `task`(
