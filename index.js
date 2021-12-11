@@ -1,8 +1,9 @@
 const express = require("express");
 const app = express();
 
-const roleRouter = require('./routes/roleRouter');
 const loginRouter = require('./routes/loginRouter');
+const userRouter = require('./routes/userRouter');
+const roleRouter = require('./routes/roleRouter');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -12,8 +13,10 @@ app.get("/api", (req , res) => {
         mensaje: "Api"
     });
 });
- app.use('/api/role', roleRouter);
- app.use('/api/login', loginRouter);
+
+app.use('/api/login', loginRouter);
+app.use('/api/user', userRouter);
+app.use('/api/role', roleRouter);
 
 app.listen(process.env.PORT || 3000, () => {
     console.log("nodejs app running...");

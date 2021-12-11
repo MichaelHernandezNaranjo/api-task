@@ -4,7 +4,7 @@ CREATE TABLE `user`(
     `email` VARCHAR(120) NOT NULL,
     `userName` VARCHAR(120) NOT NULL,
     `password` VARCHAR(200) NOT NULL,
-    `active` BIT NOT NULL,
+    `active` TINYINT(1) NOT NULL,
     `createDate` DATETIME NOT NULL,
     CONSTRAINT `pk_user` PRIMARY KEY (`userId`)
 );
@@ -14,7 +14,7 @@ CREATE TABLE `user`(
 --     `email` VARCHAR(120) NULL,
 --     `userName` VARCHAR(120) NOT NULL,
 --     `password` VARCHAR(200) NOT NULL,
---     `active` BIT NOT NULL,
+--     `active` TINYINT(1) NOT NULL,
 --     `createDate` DATETIME NOT NULL,
 --     CONSTRAINT `pk_userConfig` PRIMARY KEY (`userId`),
 --     CONSTRAINT `fk_userConfig_user` FOREIGN KEY (`userId`) REFERENCES `user` (`userId`)
@@ -24,7 +24,7 @@ CREATE TABLE `project`(
     `projectId` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(120) NOT NULL,
     `description` VARCHAR(500) NULL,
-    `active` BIT NOT NULL,
+    `active` TINYINT(1) NOT NULL,
     `createDate` DATETIME NOT NULL,
     `createUserId` INT NOT NULL,
     CONSTRAINT `pk_project` PRIMARY KEY (`projectId`)
@@ -35,7 +35,7 @@ CREATE TABLE `sprint`(
     `sprintId` INT NOT NULL,
     `name` VARCHAR(120) NOT NULL,
     `description` VARCHAR(500) NULL,
-    `active` BIT NOT NULL,
+    `active` TINYINT(1) NOT NULL,
     `createDate` DATETIME NOT NULL,
     `createUserId` INT NOT NULL,
     CONSTRAINT `pk_sprint` PRIMARY KEY (`projectId`,`sprintId`),
@@ -46,7 +46,7 @@ CREATE TABLE `status`(
     `projectId` INT NOT NULL,
     `statusId` INT NOT NULL,
     `name` VARCHAR(120) NOT NULL,
-    `active` BIT NOT NULL,
+    `active` TINYINT(1) NOT NULL,
     `createDate` DATETIME NOT NULL,
     `createUserId` INT NOT NULL,
     CONSTRAINT `pk_status` PRIMARY KEY (`projectId`,`statusId`),
@@ -60,7 +60,7 @@ CREATE TABLE `task`(
     `statusId` INT NOT NULL,
     `name` VARCHAR(120) NOT NULL,
     `description` VARCHAR(500) NULL,
-    `active` BIT NOT NULL,
+    `active` TINYINT(1) NOT NULL,
     `createDate` DATETIME NOT NULL,
     `createUserId` INT NOT NULL,
     CONSTRAINT `pk_task` PRIMARY KEY (`projectId`,`taskId`),

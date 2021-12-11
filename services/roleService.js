@@ -6,11 +6,11 @@ async function getAll(page = 1, search = ''){
     const offset = helper.getOffset(page, config.listPerPage);
     const rows = await db.query(
       `SELECT roleId, name FROM role WHERE name LIKE ? LIMIT ?,?;`,
-      ['%' +search + '%', offset, config.listPerPage]
+      ['%' + search + '%', offset, config.listPerPage]
     );
     const rows2 = await db.query(
       `SELECT COUNT(*) count FROM role WHERE name LIKE ?;`,
-      ['%' +search + '%']
+      ['%' + search + '%']
     );
     const data = helper.emptyOrRows(rows);
     const meta = {page: parseInt(page), limit: config.listPerPage, count: helper.emptyOrRows(rows2)[0].count, search: search};

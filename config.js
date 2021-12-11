@@ -6,8 +6,9 @@ const config = {
     user: env.DB_USER || 'api',
     password: env.DB_PASSWORD || '123456',
     database: env.DB_NAME || 'data',
+    port: env.DB_PORT || '3306'
   },
-  listPerPage: env.LIST_PER_PAGE || 2,
+  listPerPage: env.LIST_PER_PAGE || 10,
   SecretKey: env.SECRECT_KEY || 'JDIFN3745YY3NI3NIH54Y8HG843H75T3NFJNRGJN4I99ID'
 };
 module.exports = config;
