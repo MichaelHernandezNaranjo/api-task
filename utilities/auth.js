@@ -1,7 +1,6 @@
 
 const config = require('../config');
-
-
+const jwt = require("jsonwebtoken");
 
  function verifyToken(req, res, next){
   const bearerHeader =  req.headers['authorization'];
@@ -14,6 +13,19 @@ const config = require('../config');
   }
 }
 
+function  dataToken(token)  {
+  var res = {};
+  jwt.verify(token, config.SecretKey, (error, authData) => {
+    if(error){
+      res = { status: false, error: 'Error al obtener datos del token'};
+    }else{
+      res = { status: true, data: authData };
+    }
+  });
+  return res;
+}
+
 module.exports = {
-  verifyToken
+  verifyToken,
+  dataToken
 }

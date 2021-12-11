@@ -27,7 +27,7 @@ router.get('/', auth.verifyToken , async function(req, res, next) {
   });
 
 /* POST user */
-router.post('/', async function(req, res, next) {
+router.post('/', auth.verifyToken, async function(req, res, next) {
     try {
       var entitie = {
         email:req.body.email,
@@ -49,7 +49,7 @@ router.post('/', async function(req, res, next) {
   });
 
   /* PUT user */
-  router.put('/:id', async function(req, res, next) {
+  router.put('/:id', auth.verifyToken, async function(req, res, next) {
     try {
       res.json(await userService.update(req.params.id, req.body));
     } catch (err) {
@@ -59,7 +59,7 @@ router.post('/', async function(req, res, next) {
   });
 
    /* PUT user password */
-   router.put('/password:id', async function(req, res, next) {
+   router.put('/password:id', auth.verifyToken, async function(req, res, next) {
     try {
       res.json(await userService.updatePassword(req.params.id, security.encriptar(rreq.body.password)));
     } catch (err) {
@@ -69,7 +69,7 @@ router.post('/', async function(req, res, next) {
   });
 
   /* DELETE user */
-  router.delete('/:id', async function(req, res, next) {
+  router.delete('/:id', auth.verifyToken, async function(req, res, next) {
     try {
       res.json(await userService.remove(req.params.id));
     } catch (err) {

@@ -5,7 +5,7 @@ const config = require('../config');
 async function getAll(projectId, page = 1, search = ''){
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT projectId, sprintId, name, description, active, createDate FROM sprint WHERE projectId=? and name LIKE ? OR description LIKE ? LIMIT ?,?;`,
+    `SELECT projectId, sprintId, name, description, active, createDate, createUserId FROM sprint WHERE projectId=? and name LIKE ? OR description LIKE ? LIMIT ?,?;`,
       [projectId,'%' + search + '%','%' + search + '%', offset, config.listPerPage]
       );
       const rows2 = await db.query(
@@ -22,7 +22,7 @@ async function getAll(projectId, page = 1, search = ''){
 
   async function get(projectId, sprintId){
     const rows = await db.query(
-      `SELECT projectId, sprintId, name, description, active, createDate FROM sprint where projectId=? and sprintId = ?`,
+      `SELECT projectId, sprintId, name, description, active, createDate, createUserId FROM sprint where projectId=? and sprintId = ?`,
       [projectId, sprintId]
     );
     return rows[0];
@@ -31,9 +31,9 @@ async function getAll(projectId, page = 1, search = ''){
 async function create(entitie){
     const res = await db.query(
       `INSERT INTO sprint
-      (projectId,sprintId,name,description,active,createDate)
+      (projectId,sprintId,name,description,active,createDate,createUserId)
       VALUES
-      (?,(select isnull(max(sprintId)) from sprint where projectId=?),?,?,?);
+      (?,(select isnull(max(sprintId)) from sprint where projectId=?),?,?,?,?);
       `,
       [
         entitie.projectId,
@@ -41,7 +41,8 @@ async function create(entitie){
         entitie.name,
         entitie.description,
         entitie.active,
-        entitie.createDate
+        entitie.createDate,
+        entitie.createUserId
       ]
     );
     console.log(res);

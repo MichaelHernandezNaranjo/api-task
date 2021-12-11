@@ -5,12 +5,12 @@ const config = require('../config');
 async function getAll(projectId, page = 1, search = ''){
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT projectId, statusId, name, active, createDate FROM status WHERE projectId=? and name LIKE ? LIMIT ?,?;`,
-      [projectId,'%' + search + '%','%' + search + '%', offset, config.listPerPage]
+    `SELECT projectId, statusId, name, active, createDate, createUserId FROM status WHERE projectId=? and name LIKE ? LIMIT ?,?;`,
+      [projectId,'%' + search + '%', offset, config.listPerPage]
       );
       const rows2 = await db.query(
-      `SELECT COUNT(*) count FROM status WHERE projectId=? and statusName LIKE ?;`,
-      [projectId, '%' + search + '%','%' + search + '%']
+      `SELECT COUNT(*) count FROM status WHERE projectId=? and name LIKE ?;`,
+      [projectId, '%' + search + '%']
     );
     const data = helper.emptyOrRows(rows);
     const meta = {page: parseInt(page), limit: config.listPerPage, count: helper.emptyOrRows(rows2)[0].count, search: search};
@@ -22,7 +22,7 @@ async function getAll(projectId, page = 1, search = ''){
 
   async function get(projectId, statusId){
     const rows = await db.query(
-      `SELECT projectId, statusId, name, active, createDate FROM status where projectId=? and statusId=?`,
+      `SELECT projectId, statusId, name, active, createDate, createUserId FROM status where projectId=? and statusId=?`,
       [projectId, statusId]
     );
     return rows[0];
@@ -31,16 +31,17 @@ async function getAll(projectId, page = 1, search = ''){
 async function create(entitie){
     const res = await db.query(
       `INSERT INTO status
-      (projectId,statusId,name,active,createDate)
+      (projectId,statusId,name,active,createDate,createUserId)
       VALUES
-      (?,(select isnull(max(statusId)) from status where projectId=?),?,?,?);
+      (?,(select isnull(max(statusId)) from status where projectId=?),?,?,?,?);
       `,
       [
         entitie.projectId,
         entitie.projectId,
         entitie.name,
         entitie.active,
-        entitie.createDate
+        entitie.createDate,
+        entitie.createUserId
       ]
     );
     console.log(res);

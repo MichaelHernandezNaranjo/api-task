@@ -28,17 +28,8 @@ router.post('/', async function(req, res, next) {
     }
   });
 
-  router.post("/verifyToken", auth.verifyToken, (req , res) => {
-    jwt.verify(req.token, config.SecretKey, (error, authData) => {
-        if(error){
-            res.sendStatus(403);
-        }else{
-            res.json({
-              mensaje: "Post fue creado",
-              authData
-            });
-        }
-    });
+router.post("/verifyToken", auth.verifyToken, (req , res) => {
+    res.json(auth.dataToken(req.token).data);
 });
 
 

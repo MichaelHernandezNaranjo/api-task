@@ -1,15 +1,16 @@
 const db = require('../utilities/db');
 const helper = require('../helper');
 const config = require('../config');
+const sprintService = require('../services/sprintService');
 
 async function getAll(projectId, page = 1, search = ''){
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT projectId, taskId, sprintId, statusId, name, description, active, createDate FROM task WHERE projectId=? and name LIKE ? OR description LIKE ? LIMIT ?,?;`,
+    `SELECT projectId, taskId, sprintId, statusId, name, description, active, createDate, createUserId FROM task WHERE projectId=? and name LIKE ? OR description LIKE ? LIMIT ?,?;`,
       [projectId,'%' + search + '%','%' + search + '%', offset, config.listPerPage]
       );
       const rows2 = await db.query(
-      `SELECT COUNT(*) count FROM task WHERE projectId=? and taskName LIKE ? OR description LIKE ?;`,
+      `SELECT COUNT(*) count FROM task WHERE projectId=? and name LIKE ? OR description LIKE ?;`,
       [projectId, '%' + search + '%','%' + search + '%']
     );
     const data = helper.emptyOrRows(rows);
@@ -22,18 +23,24 @@ async function getAll(projectId, page = 1, search = ''){
 
   async function get(projectId, taskId){
     const rows = await db.query(
-      `SELECT projectId, taskId, sprintId, statusId, name, description, active, createDate FROM task where projectId=? and taskId = ?`,
+      `SELECT projectId, taskId, sprintId, statusId, name, description, active, createDate, createUserId FROM task where projectId=? and taskId = ?`,
       [projectId, taskId]
     );
+    var res = rows.map(x=> new {
+      projectId: x.projectId,
+      taskId: x.taskId,
+      name: x.name
+    })
+    console.log(res);
     return rows[0];
   }
 
 async function create(entitie){
     const res = await db.query(
       `INSERT INTO task
-      (projectId,taskId,sprintId,statusId,name,description,active,createDate)
+      (projectId,taskId,sprintId,statusId,name,description,active,createDate,createUserId)
       VALUES
-      (?,(select isnull(max(taskId)) from task where projectId=?),?,?,?);
+      (?,(select isnull(max(taskId)) from task where projectId=?),?,?,?,?);
       `,
       [
         entitie.projectId,
@@ -43,7 +50,8 @@ async function create(entitie){
         entitie.name,
         entitie.description,
         entitie.active,
-        entitie.createDate
+        entitie.createDate,
+        entitie.createUserId
       ]
     );
     console.log(res);

@@ -5,11 +5,11 @@ const config = require('../config');
 async function getAll(page = 1, search = ''){
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT projectId, name, description, active, createDate FROM project WHERE name LIKE ? OR description LIKE ? LIMIT ?,?;`,
+    `SELECT projectId, name, description, active, createDate, createUserId FROM project WHERE name LIKE ? OR description LIKE ? LIMIT ?,?;`,
       ['%' + search + '%','%' + search + '%', offset, config.listPerPage]
       );
       const rows2 = await db.query(
-      `SELECT COUNT(*) count FROM project WHERE projectName LIKE ? OR description LIKE ?;`,
+      `SELECT COUNT(*) count FROM project WHERE name LIKE ? OR description LIKE ?;`,
       ['%' + search + '%','%' + search + '%']
     );
     const data = helper.emptyOrRows(rows);
@@ -22,7 +22,7 @@ async function getAll(page = 1, search = ''){
 
   async function get(projectId){
     const rows = await db.query(
-      `SELECT projectId, name, description, active, createDate FROM project where projectId = ?`,
+      `SELECT projectId, name, description, active, createDate, createUserId FROM project where projectId = ?`,
       [projectId]
     );
     return rows[0];
@@ -31,15 +31,16 @@ async function getAll(page = 1, search = ''){
 async function create(entitie){
     const res = await db.query(
       `INSERT INTO project
-      (name,description,active,createDate)
+      (name,description,active,createDate,createUserId)
       VALUES
-      (?,?,?,?);
+      (?,?,?,?,?);
       `,
       [
         entitie.name,
         entitie.description,
         entitie.active,
-        entitie.createDate
+        entitie.createDate,
+        entitie.createUserId
       ]
     );
     console.log(res);
