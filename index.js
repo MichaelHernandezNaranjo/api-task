@@ -19,5 +19,5 @@ app.use('/api/user', userRouter);
 app.use('/api/role', roleRouter);
 
 app.listen(process.env.PORT || 3000, () => {
-    console.log("nodejs app running...");
+    console.log("nodejs api running...");
 });
