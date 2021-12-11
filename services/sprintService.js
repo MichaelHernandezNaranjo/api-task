@@ -69,7 +69,7 @@ async function create(entitie){
   async function remove(projectId, sprintId){
     const result = await db.query(
       `DELETE FROM sprint WHERE projectId=? and sprintId=?`, 
-      [sprintId]
+      [projectId,sprintId]
     );
     if (result.affectedRows) {
       return true;

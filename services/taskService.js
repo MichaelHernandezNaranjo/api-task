@@ -5,11 +5,11 @@ const config = require('../config');
 async function getAll(projectId, page = 1, search = ''){
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT projectId, statusId, name, active, createDate FROM status WHERE projectId=? and name LIKE ? LIMIT ?,?;`,
+    `SELECT projectId, taskId, sprintId, statusId, name, description, active, createDate FROM task WHERE projectId=? and name LIKE ? OR description LIKE ? LIMIT ?,?;`,
       [projectId,'%' + search + '%','%' + search + '%', offset, config.listPerPage]
       );
       const rows2 = await db.query(
-      `SELECT COUNT(*) count FROM status WHERE projectId=? and statusName LIKE ?;`,
+      `SELECT COUNT(*) count FROM task WHERE projectId=? and taskName LIKE ? OR description LIKE ?;`,
       [projectId, '%' + search + '%','%' + search + '%']
     );
     const data = helper.emptyOrRows(rows);
@@ -20,25 +20,28 @@ async function getAll(projectId, page = 1, search = ''){
     };
   }
 
-  async function get(projectId, statusId){
+  async function get(projectId, taskId){
     const rows = await db.query(
-      `SELECT projectId, statusId, name, active, createDate FROM status where projectId=? and statusId=?`,
-      [projectId, statusId]
+      `SELECT projectId, taskId, sprintId, statusId, name, description, active, createDate FROM task where projectId=? and taskId = ?`,
+      [projectId, taskId]
     );
     return rows[0];
   }
 
 async function create(entitie){
     const res = await db.query(
-      `INSERT INTO status
-      (projectId,statusId,name,active,createDate)
+      `INSERT INTO task
+      (projectId,taskId,sprintId,statusId,name,description,active,createDate)
       VALUES
-      (?,(select isnull(max(statusId)) from status where projectId=?),?,?,?);
+      (?,(select isnull(max(taskId)) from task where projectId=?),?,?,?);
       `,
       [
         entitie.projectId,
         entitie.projectId,
+        entitie.sprintId,
+        entitie.statusId,
         entitie.name,
+        entitie.description,
         entitie.active,
         entitie.createDate
       ]
@@ -50,13 +53,13 @@ async function create(entitie){
     return 0;
   }
 
-  async function update(projectId,statusId, entitie){
+  async function update(projectId,taskId, entitie){
     const result = await db.query(
-      `UPDATE status
-      SET name=?,active=?
-      WHERE projectId=? and statusId=?`,
+      `UPDATE task
+      SET sprintId=?,statusId=?,name=?,description=?,active=?
+      WHERE projectId=? and taskId=?`,
       [
-        entitie.name, entitie.active, projectId, statusId
+        entitie.sprintId,entitie.statusId,entitie.name, entitie.description, entitie.active, projectId, taskId
       ]
     );
     if (result.affectedRows) {
@@ -65,10 +68,10 @@ async function create(entitie){
     return false;
   }
 
-  async function remove(projectId, statusId){
+  async function remove(projectId, taskId){
     const result = await db.query(
-      `DELETE FROM status WHERE projectId=? and statusId=?`, 
-      [projectId,statusId]
+      `DELETE FROM task WHERE projectId=? and taskId=?`, 
+      [projectId,taskId]
     );
     if (result.affectedRows) {
       return true;
