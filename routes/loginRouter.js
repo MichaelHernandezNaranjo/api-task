@@ -1,13 +1,15 @@
 const express = require('express');
-const router = express.Router();
-const authService = require('../services/authService');
 const jwt = require("jsonwebtoken");
+const router = express.Router();
+
 const config = require('../config');
+const auth = require('../utilities/auth');
+const loginService = require('../services/loginService');
 
 /* POST auth */
 router.post('/', async function(req, res, next) {
     try {
-      var _res = await authService.auth(req.body);
+      var _res = await loginService.login(req.body);
       if(_res != null){
         jwt.sign({"user":_res}, config.SecretKey, {expiresIn: '2 days'}, (err, token) => {
           res.json({
@@ -26,31 +28,18 @@ router.post('/', async function(req, res, next) {
     }
   });
 
-  router.post("/verifyToken", verifyToken, (req , res) => {
-
+  router.post("/verifyToken", auth.verifyToken, (req , res) => {
     jwt.verify(req.token, config.SecretKey, (error, authData) => {
         if(error){
             res.sendStatus(403);
         }else{
             res.json({
-                    mensaje: "Post fue creado",
-                    authData
-                });
+              mensaje: "Post fue creado",
+              authData
+            });
         }
     });
 });
 
-// Authorization: Bearer <token>
-function verifyToken(req, res, next){
-     const bearerHeader =  req.headers['authorization'];
-
-     if(typeof bearerHeader !== 'undefined'){
-          const bearerToken = bearerHeader.split(" ")[1];
-          req.token  = bearerToken;
-          next();
-     }else{
-         res.sendStatus(403);
-     }
-}
 
 module.exports = router;

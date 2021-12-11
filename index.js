@@ -1,21 +1,19 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
-
 const app = express();
 
-const companyRouter = require('./routes/company');
-const authRouter = require('./routes/authRouter');
+const roleRouter = require('./routes/roleRouter');
+const loginRouter = require('./routes/loginRouter');
 
-app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.get("/api", (req , res) => {
     res.json({
         mensaje: "Api"
     });
 });
-app.use('/api/company', companyRouter);
-app.use('/api/auth', authRouter);
+ app.use('/api/role', roleRouter);
+ app.use('/api/login', loginRouter);
 
 app.listen(process.env.PORT || 3000, () => {
     console.log("nodejs app running...");
