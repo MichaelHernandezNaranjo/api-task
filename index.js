@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.get("/api", (req , res) => {
     res.json({
-        mensaje: "Api 2"
+        mensaje: "Api 3"
     });
 });
 
