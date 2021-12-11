@@ -61,7 +61,7 @@ router.post('/', async function(req, res, next) {
    /* PUT user password */
    router.put('/password:id', async function(req, res, next) {
     try {
-      res.json(await userService.updatPassword(req.params.id, security.encriptar(rreq.body.password)));
+      res.json(await userService.updatePassword(req.params.id, security.encriptar(rreq.body.password)));
     } catch (err) {
       console.error(`Error al actulizar user`, err.message);
       next(err);
