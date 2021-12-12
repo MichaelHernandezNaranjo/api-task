@@ -25,14 +25,14 @@ router.get('/:projectId', auth.verifyToken , async function(req, res, next) {
   });
 
 /* POST task */
-router.post('/', auth.verifyToken, async function(req, res, next) {
+router.post('/:projectId', auth.verifyToken, async function(req, res, next) {
     try {
       var dataToken =  auth.dataToken(req.token);
       if(!dataToken.status){
         res.status(401).json({'error':dataToken.error})
       }
       var entitie = {
-        projectId:req.body.projectId,
+        projectId:req.params.projectId,
         sprintId:req.body.sprintId,
         statusId:req.body.statusId,
         name:req.body.name,
@@ -43,7 +43,7 @@ router.post('/', auth.verifyToken, async function(req, res, next) {
       };
       var taskId = await taskService.create(entitie);
       if(taskId > 0){
-        res.json(await taskService.get(req.body.projectId,taskId));
+        res.json(await taskService.get(req.params.projectId,taskId));
       }else{
         console.error(`Error al crear task`);
         res.status(400).json({'message':'Error al crear task'});

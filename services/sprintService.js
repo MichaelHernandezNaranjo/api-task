@@ -9,7 +9,7 @@ async function getAll(projectId, page = 1, search = ''){
       [projectId,'%' + search + '%','%' + search + '%', offset, config.listPerPage]
       );
       const rows2 = await db.query(
-      `SELECT COUNT(*) count FROM sprint WHERE projectId=? and sprintName LIKE ? OR description LIKE ?;`,
+      `SELECT COUNT(*) count FROM sprint WHERE projectId=? and name LIKE ? OR description LIKE ?;`,
       [projectId, '%' + search + '%','%' + search + '%']
     );
     const data = helper.emptyOrRows(rows);
@@ -29,15 +29,16 @@ async function getAll(projectId, page = 1, search = ''){
   }
 
 async function create(entitie){
+  var sprintId = await next(entitie.projectId);
     const res = await db.query(
       `INSERT INTO sprint
       (projectId,sprintId,name,description,active,createDate,createUserId)
       VALUES
-      (?,(select isnull(max(sprintId)) from sprint where projectId=?),?,?,?,?);
+      (?,?,?,?,?,?,?);
       `,
       [
         entitie.projectId,
-        entitie.projectId,
+        sprintId,
         entitie.name,
         entitie.description,
         entitie.active,
@@ -47,7 +48,7 @@ async function create(entitie){
     );
     console.log(res);
     if (res.affectedRows) {
-      return res.insertId;
+      return sprintId;
     }
     return 0;
   }
@@ -76,6 +77,14 @@ async function create(entitie){
       return true;
     }
     return false;
+  }
+
+  async function next(projectId){
+    const rows = await db.query(
+      `select max(sprintId) sprintId from sprint where projectId=?`, 
+      [projectId]
+    );
+    return parseInt(rows[0].sprintId == 0 ? 1 : rows[0].sprintId + 1);
   }
 
   module.exports = {

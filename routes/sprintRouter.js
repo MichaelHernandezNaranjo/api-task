@@ -25,14 +25,14 @@ router.get('/:projectId', auth.verifyToken , async function(req, res, next) {
   });
 
 /* POST sprint */
-router.post('/', auth.verifyToken, async function(req, res, next) {
+router.post('/:projectId', auth.verifyToken, async function(req, res, next) {
     try {
       var dataToken =  auth.dataToken(req.token);
       if(!dataToken.status){
         res.status(401).json({'error':dataToken.error})
       }
       var entitie = {
-        projectId:req.body.projectId,
+        projectId:req.params.projectId,
         name:req.body.name,
         description:req.body.description,
         active:req.body.active,
@@ -41,7 +41,7 @@ router.post('/', auth.verifyToken, async function(req, res, next) {
       };
       var sprintId = await sprintService.create(entitie);
       if(sprintId > 0){
-        res.json(await sprintService.get(req.body.projectId,sprintId));
+        res.json(await sprintService.get(req.params.projectId,sprintId));
       }else{
         console.error(`Error al crear sprint`);
         res.status(400).json({'message':'Error al crear sprint'});

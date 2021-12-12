@@ -36,15 +36,16 @@ async function getAll(projectId, page = 1, search = ''){
   }
 
 async function create(entitie){
+  var taskId = await next(entitie.projectId);
     const res = await db.query(
       `INSERT INTO task
       (projectId,taskId,sprintId,statusId,name,description,active,createDate,createUserId)
       VALUES
-      (?,(select isnull(max(taskId)) from task where projectId=?),?,?,?,?);
+      (?,?,?,?,?,?,?,?,?);
       `,
       [
         entitie.projectId,
-        entitie.projectId,
+        taskId,
         entitie.sprintId,
         entitie.statusId,
         entitie.name,
@@ -56,7 +57,7 @@ async function create(entitie){
     );
     console.log(res);
     if (res.affectedRows) {
-      return res.insertId;
+      return taskId;
     }
     return 0;
   }
@@ -85,6 +86,14 @@ async function create(entitie){
       return true;
     }
     return false;
+  }
+
+  async function next(projectId){
+    const rows = await db.query(
+      `select max(taskId) taskId from task where projectId=?`, 
+      [projectId]
+    );
+    return parseInt(rows[0].taskId == 0 ? 1 : rows[0].taskId + 1);
   }
 
   module.exports = {

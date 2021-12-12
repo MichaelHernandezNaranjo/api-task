@@ -29,15 +29,16 @@ async function getAll(projectId, page = 1, search = ''){
   }
 
 async function create(entitie){
+  var statusId = await next(entitie.projectId);
     const res = await db.query(
       `INSERT INTO status
       (projectId,statusId,name,active,createDate,createUserId)
       VALUES
-      (?,(select isnull(max(statusId)) from status where projectId=?),?,?,?,?);
+      (?,?,?,?,?,?);
       `,
       [
         entitie.projectId,
-        entitie.projectId,
+        statusId,
         entitie.name,
         entitie.active,
         entitie.createDate,
@@ -46,7 +47,7 @@ async function create(entitie){
     );
     console.log(res);
     if (res.affectedRows) {
-      return res.insertId;
+      return statusId;
     }
     return 0;
   }
@@ -75,6 +76,14 @@ async function create(entitie){
       return true;
     }
     return false;
+  }
+
+  async function next(projectId){
+    const rows = await db.query(
+      `select max(statusId) statusId from status where projectId=?`, 
+      [projectId]
+    );
+    return parseInt(rows[0].statusId == 0 ? 1 : rows[0].statusId + 1);
   }
 
   module.exports = {

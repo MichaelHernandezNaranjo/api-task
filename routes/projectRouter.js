@@ -3,6 +3,8 @@ const router = express.Router();
 
 const auth = require('../utilities/auth');
 const projectService = require('../services/projectService');
+const statusService = require('../services/statusService');
+const sprintService = require('../services/sprintService');
 
 /* GET ALL project */
 router.get('/', auth.verifyToken , async function(req, res, next) {
@@ -32,7 +34,6 @@ router.post('/', auth.verifyToken, async function(req, res, next) {
       if(!dataToken.status){
         res.status(401).json({'error':dataToken.error})
       }
-
       var entitie = {
         name:req.body.name,
         description:req.body.description,
@@ -40,9 +41,41 @@ router.post('/', auth.verifyToken, async function(req, res, next) {
         createDate:new Date(),
         createUserId: dataToken.data.user.userId
       };
+      //Creamo el proyecto
       var projectId = await projectService.create(entitie);
+      // Creamos los status del proyecto y lo añadimos al objeto de respuesta
       if(projectId > 0){
-        res.json(await projectService.get(projectId));
+        var ArrayStatus = [];
+        let ArrayStatusName = ['Sin asignar','Pendientes','En progreso','En prueba','Terminadas'];
+        for (let i = 0; i < ArrayStatusName.length; i++) {
+          var status = {
+            projectId:projectId,
+            name:ArrayStatusName[i],
+            active:1,
+            createDate:new Date(),
+            createUserId: dataToken.data.user.userId
+          };
+          var statusId = await statusService.create(status);
+          status.statusId = statusId;
+          ArrayStatus.push(status);
+        }
+        // Creamos el sptrint del proyecto y lo añadimos al objeto de respuesta
+        var sprint = {
+          projectId:projectId,
+          name:'Sprint 1',
+          description: 'Sprint 1',
+          active:1,
+          createDate:new Date(),
+          createUserId: dataToken.data.user.userId
+        };
+        var sprintId = await sprintService.create(sprint);
+        sprint.sprintId = sprintId;
+
+        //Consultamos el projecto
+        var project = await projectService.get(projectId);
+        project.status = ArrayStatus;
+        project.sprint = sprint;
+        res.json(project);
       }else{
         console.error(`Error al crear project`);
         res.status(400).json({'message':'Error al crear project'});
